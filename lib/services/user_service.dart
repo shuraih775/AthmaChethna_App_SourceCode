@@ -4,7 +4,7 @@ import 'storage_service.dart';
 
 class UserService {
   final String baseUrl =
-      "http://192.168.31.52:5000/api/user"; // Updated base URL
+      "http://192.168.0.111:5000/api/user"; // Updated base URL
   final StorageService _storageService = StorageService();
 
   // ✅ Fetch user data using userId from backend

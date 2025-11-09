@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
-import 'forgetpassword.dart'; // Forgot Password Page Import
-import 'homescreen.dart'; // Home Screen Page Import
+import 'forgetpassword.dart';
+import 'homescreen.dart';
 import 'services/storage_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -20,91 +20,89 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController usernameController = TextEditingController();
 
-  Future<void> _login() async {
-    if (!_formKey.currentState!.validate()) return;
+Future<void> _login() async {
+  if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+  setState(() {
+    _isLoading = true;
+  });
 
-    final String apiUrl = "http://192.168.31.52:5000/api/auth/login";
-    final Map<String, dynamic> loginData = {
-      "username": usernameController.text.trim(),
-      "email": emailController.text.trim(),
-      "password": passwordController.text.trim(),
-    };
+  final String apiUrl = "http://192.168.0.111:5000/api/auth/login";
+  final Map<String, dynamic> loginData = {
+    "email": emailController.text.trim(),
+    "password": passwordController.text.trim(),
+  };
 
-    try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(loginData),
+  try {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(loginData),
+    );
+
+    print("Response Status Code: ${response.statusCode}");
+    final responseData = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && responseData['success'] == true) {
+      Fluttertoast.showToast(msg: "Logged in successfully!");
+
+      // ✅ FIXED: Get user data correctly
+      final user = responseData['data']?['user'];
+      final token = responseData['data']?['token'];
+
+      if (user == null) {
+        Fluttertoast.showToast(msg: "Error: User data missing in response.");
+        return;
+      }
+
+      // ✅ Save user details in secure storage
+      StorageService storageService = StorageService();
+      await storageService.saveLoginDetails(
+        userId: user['id'] ?? '',
+        username: user['name'] ?? '',
+        email: user['email'] ?? '',
+        password: passwordController.text.trim(),
       );
 
-      print("Response Status Code: ${response.statusCode}");
+      print("User ID Stored: ${user['id']}");
+      print("Token: $token");
 
-      final responseData = jsonDecode(response.body);
-
-      if (response.statusCode == 200) {
-        Fluttertoast.showToast(msg: "Logged in successfully!");
-
-        final user = responseData['user'];
-        if (user == null) {
-          print("Error: User object not found in response.");
-          Fluttertoast.showToast(msg: "Error: User data missing in response.");
-          return;
-        }
-
-        // Extract user data
-        //final user = responseData['user'];
-        //if (!user.containsKey('_id')) {
-        //print("Error: 'userId' not found in response.");
-        //Fluttertoast.showToast(msg: "Error: User ID missing in response.");
-        //return;
-        //}
-
-        // Save user details (username, email, password, userId) in secure storage
-        StorageService storageService = StorageService();
-        await storageService.saveLoginDetails(
-          userId: user['_id'],
-          username: user['username'] ?? '',
-          email: user['email'] ?? '',
-          password: passwordController.text.trim(),
-        );
-
-        print("User ID Stored: ${user['_id']}");
-
-        // Navigate to HomeScreen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-      } else {
-        print("Error Message: ${responseData['message']}");
-        Fluttertoast.showToast(msg: responseData['message'] ?? "Login failed");
-      }
-    } catch (error) {
-      print("Exception: $error");
-      Fluttertoast.showToast(msg: "Error: Unable to connect to server.");
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      // Navigate to HomeScreen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+    } else {
+      print("Error Message: ${responseData['message']}");
+      Fluttertoast.showToast(msg: responseData['message'] ?? "Login failed");
     }
+  } catch (error) {
+    print("Exception: $error");
+    Fluttertoast.showToast(msg: "Error: Unable to connect to server.");
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFCEBCB),
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true, // ✅ fixes keyboard issue
       body: Stack(
         children: [
           _buildBackground(),
           SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 70),
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 70,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -229,16 +227,10 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         children: [
           _buildTextField(
-            usernameController,
-            "Username",
-            TextInputType.text,
-            "Username is required",
-          ),
-          _buildTextField(
             emailController,
             "Email",
             TextInputType.emailAddress,
-            "Only @bmsce.ac.in emails allowed",
+            "Enter your email",
             emailValidation: true,
           ),
           _buildPasswordField(),
@@ -286,8 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
         controller: passwordController,
         obscureText: !_isPasswordVisible,
         validator:
-            (value) =>
-                value == null || value.isEmpty ? "Password is required" : null,
+            (value) => value == null || value.isEmpty ? "Password is required" : null,
         decoration: InputDecoration(
           labelText: "Password",
           labelStyle: const TextStyle(color: Colors.black),

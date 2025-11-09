@@ -37,7 +37,7 @@ class _AccountPageState extends State<AccountPage> {
         return;
       }
 
-      final String apiUrl = "http://192.168.31.52:5000/api/user/$userId";
+      final String apiUrl = "http://192.168.0.111:5000/api/user/$userId";
       final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {

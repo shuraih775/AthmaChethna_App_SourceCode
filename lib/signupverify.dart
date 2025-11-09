@@ -58,7 +58,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
 
     setState(() => _isVerifying = true);
 
-    final String apiUrl = "http://192.168.31.52:5000/api/auth/verify-otp";
+    final String apiUrl = "http://192.168.0.111:5000/api/auth/verify-otp";
     final Map<String, dynamic> otpData = {
       "email": widget.email,
       "otp": otpCode,
@@ -96,7 +96,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   Future<void> _resendOTP() async {
     setState(() => _isResending = true);
 
-    final String apiUrl = "http://192.168.31.52:5000/api/auth/resend-otp";
+    final String apiUrl = "http://192.168.0.111:5000/api/auth/resend-otp";
     final Map<String, dynamic> requestData = {"email": widget.email};
 
     try {

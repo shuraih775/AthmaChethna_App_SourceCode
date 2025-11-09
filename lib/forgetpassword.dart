@@ -37,7 +37,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.31.52:5000/api/auth/forgotpassword'),
+        Uri.parse('http://192.168.0.111:5000/api/auth/forgotpassword'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": email}),
       );

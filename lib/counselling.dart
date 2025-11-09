@@ -31,7 +31,7 @@ class _CounsellingScreenState extends State<CounsellingScreen> {
     setState(() => isLoading = true);
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.31.52:5000/api/auth/user/$userId'),
+        Uri.parse('http://192.168.0.111:5000/api/auth/user/$userId'),
         headers: {'Content-Type': 'application/json'},
       );
       print('Response Status: ${response.statusCode}');
@@ -66,7 +66,7 @@ class _CounsellingScreenState extends State<CounsellingScreen> {
     setState(() => isLoading = true);
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.31.52:5000/api/appointments/create'),
+        Uri.parse('http://192.168.0.111:5000/api/appointments/create'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'userId': userId,

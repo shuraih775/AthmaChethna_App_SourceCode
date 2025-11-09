@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class MongoDBService {
-  static const String baseUrl = "http://192.168.31.52:5000";
+  static const String baseUrl = "http://192.168.0.111:5000";
 
   static Future<Map<String, dynamic>> signupUser(
     Map<String, dynamic> userData,

@@ -59,7 +59,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
 
     final response = await http.post(
       Uri.parse(
-        'http://192.168.31.52:5000/api/auth/verify-forgot-password-otp',
+        'http://192.168.0.111:5000/api/auth/verify-forgot-password-otp',
       ),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"email": widget.email, "otp": otpCode}),

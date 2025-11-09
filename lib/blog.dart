@@ -40,7 +40,7 @@ class _BlogListPageState extends State<BlogListPage> {
   // Load blogs from the backend
   Future<void> _loadBlogs() async {
     final response = await http.get(
-      Uri.parse('http://192.168.31.52:5000/api/blogs'),
+      Uri.parse('http://192.168.0.111:5000/api/blogs'),
     );
 
     if (response.statusCode == 200) {
@@ -73,7 +73,7 @@ class _BlogListPageState extends State<BlogListPage> {
   // Save the current list of blogs to the backend
   Future<void> _saveBlogs() async {
     final response = await http.post(
-      Uri.parse('http://192.168.31.52:5000/api/blogs'),
+      Uri.parse('http://192.168.0.111:5000/api/blogs'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'blogs': _blogs}),
     );
